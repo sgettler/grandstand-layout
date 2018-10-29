@@ -1,0 +1,45 @@
+/**
+ * geometry.css
+ * @author @sgettler
+ *
+ * Styles for editor geometry.
+ */
+
+
+
+/* all */
+svg {
+    z-index: -1;
+
+    background-color: #bfbfbf;
+}
+
+polygon, polyline {
+    vector-effect: non-scaling-stroke;
+}
+
+
+
+/* selectable lines */
+.selectable-line:first-child {
+  stroke-width: 16px;
+  stroke-opacity: 0;
+  stroke-dasharray: none;
+}
+
+
+
+/* grid lines */
+.grid {
+    stroke: #ff3f3f;
+    stroke-width: 1.0px;
+    stroke-dasharray: 15,5,5,5;
+}
+
+.grid:hover {
+    stroke: #00ff00;
+}
+
+.grid-selected {
+    stroke: #0000ff;
+}

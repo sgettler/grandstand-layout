@@ -1,0 +1,4 @@
+*.bat
+*.min.js
+favicon.ico
+/app/assets
