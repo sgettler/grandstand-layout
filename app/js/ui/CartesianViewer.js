@@ -29,7 +29,7 @@ SPS.CartesianViewer = function(viewPlane) {
     // view
     this.viewPlane = viewPlane;
     this.viewBounds = [];
-    this.transform(this.width/2, this.height/2, 1);
+    this.zoomCenter();
 };
 
 SPS.CartesianViewer.prototype = Object.create(SPS.SVGViewer.prototype);
@@ -87,6 +87,18 @@ SPS.CartesianViewer.prototype.zoomBounds = function(bounds) {
     this.scale = Math.min(this.width/(bounds.max.x-bounds.min.x), this.height/(bounds.max.y-bounds.min.y));
     this.transX = this.width/2  - (bounds.min.x+bounds.max.x)/2*this.scale;
     this.transY = this.height/2 + (bounds.min.y+bounds.max.y)/2*this.scale;
+    this.transform(this.transX, this.transY, this.scale);
+};
+
+
+
+/**
+ * Zoom to origin.
+ */
+SPS.CartesianViewer.prototype.zoomCenter = function() {
+    this.scale = 1;
+    this.transX = this.width/2;
+    this.transY = this.height/2;
     this.transform(this.transX, this.transY, this.scale);
 };
 

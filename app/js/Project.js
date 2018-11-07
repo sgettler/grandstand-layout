@@ -15,6 +15,12 @@
 SPS.Project = function(args) {
     this["name"] = args["name"] || "New Project";
     this["shapes"] = args["shapes"] || [];
+
+    if(this["shapes"].length == 0) {
+        this["shapes"].push(SPS.Plane.XY_PLANE);
+        this["shapes"].push(SPS.Plane.XZ_PLANE);
+        this["shapes"].push(SPS.Plane.YZ_PLANE);
+    }
 };
 
 
@@ -71,13 +77,11 @@ SPS.Project.parseJSON = function(json) {
 
 
 
-
-
-// ================
-// placeholder
-
+/**
+ * Generate sample project file and auto-download.
+ */
 SPS.Project.generateSample = function() {
-
+    // project
     var data = new SPS.Project({"name": "Sample Project"});
     data["shapes"].push(SPS.Plane.XY_PLANE);
     data["shapes"].push(SPS.Plane.XZ_PLANE);
@@ -232,7 +236,4 @@ SPS.Project.generateSample = function() {
 
     // export
     data.downloadJSON("sample.json");
-
 };
-
-// ================

@@ -35,17 +35,23 @@ polygon, polyline {
     stroke-width: 0.5px;
     stroke-dasharray: 5,5;
 }
+.origin:hover {
+    stroke: #ffffff;
+}
+
+.hidden {
+    visibility: hidden;    
+}
+
 
 .grid {
     stroke: #ff3f3f;
     stroke-width: 1.0px;
     stroke-dasharray: 15,5,5,5;
 }
-
 .grid:hover {
     stroke: #00ff00;
 }
-
 .grid-selected {
     stroke: #0000ff;
 }

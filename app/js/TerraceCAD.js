@@ -22,45 +22,53 @@ var SPS = SPS || {
  */
 SPS.TerraceCAD = function() {
 
+    // data
+    this.project = new SPS.Project({"name": "New Project"});
+
     // create page
     SPS.TerraceCAD.createLayout();
 
     var header = new SPS.Header("SPS Grandstand Layout Tool", "assets/img/sps_white_48.png");
     header.addMenu();
-    header.addMenuItem("New", null );
+    header.addMenuItem("New", null);
     header.addMenuItem("Open", null);
     header.addMenuItem("Save", null);
     header.addMenu();
-    header.addMenuItem("Export", null );
+    header.addMenuItem("Export", null);
 
     var viewer = new SPS.CartesianViewer(SPS.Plane.XY_PLANE);
-    window.addEventListener("resize", function(e) { viewer.resize(window.innerWidth-384, window.innerHeight-48); }.bind(this));
+    window.addEventListener("resize", function(e) { viewer.resize(window.innerWidth-384, window.innerHeight-64); }.bind(this));
 
 
 
     // ================
     // placeholder
 
-    var openProjectRemote = function(url) {
-        var xhr = new XMLHttpRequest();
-        xhr.addEventListener("load", function() {
-            var project = SPS.Project.parseJSON(xhr.responseText);
-            for(var s of project["shapes"]) {
-                if(s["type"] == SPS.Shape.Type.PLANE || s["type"] == SPS.Shape.Type.PLANESEG)
-                    viewer.addSelectableLine(s);
-            }
-            viewer.zoomBounds({min: {x:-3.5*30*12-7.5*12-150*12, y:-5.5*30*12-7.5*12-150*12}, max: {x:3.5*30*12+7.5*12+150*12, y:5.5*30*12+7.5*12+150*12}});
-        });
-        xhr.open("GET", url, true);
-        xhr.send();
-    }("assets/sample.json");
+    for(var s of this.project["shapes"])
+        if(s["type"] == SPS.Shape.Type.PLANE || s["type"] == SPS.Shape.Type.PLANESEG)
+            viewer.addSelectableLine(s, null);
+
+    // var openProjectRemote = function(url) {
+    //     var xhr = new XMLHttpRequest();
+    //     xhr.addEventListener("load", function() {
+    //         project = SPS.Project.parseJSON(xhr.responseText);
+    //         for(var s of project["shapes"]) {
+    //             if(s["type"] == SPS.Shape.Type.PLANE || s["type"] == SPS.Shape.Type.PLANESEG)
+    //                 viewer.addSelectableLine(s, null);
+    //         }
+    //         viewer.zoomBounds({min: {x:-3.5*30*12-7.5*12-150*12, y:-5.5*30*12-7.5*12-150*12}, max: {x:3.5*30*12+7.5*12+150*12, y:5.5*30*12+7.5*12+150*12}});
+    //     });
+    //     xhr.open("GET", url, true);
+    //     xhr.send();
+    // }("sample.json");
 
     // ================
 
 
 
     // refresh layout
-    window.dispatchEvent(new Event("resize"));
+    viewer.resize(window.innerWidth-384, window.innerHeight-64);
+    viewer.zoomCenter();
 };
 
 
