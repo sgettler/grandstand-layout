@@ -37,7 +37,11 @@ img {
 /* header */
 #header {
     flex: none;
+    height: 64px;
 
+    display: flex;
+    flex-direction: row;
+    align-items: center;
     box-sizing: border-box;
     margin: 0;
     padding: 8px 16px;
@@ -58,11 +62,11 @@ img {
 }
 
 #header-logo {
-    float: left;
+    flex: none;
 }
 
 #header-title {
-    float: left;
+    flex: none;
 
     padding: 6px 64px 4px 16px;
 
@@ -70,7 +74,7 @@ img {
 }
 
 .header-menu {
-    float: left;
+    flex: none;
 
     display: inline-block;
     box-sizing: border-box;
