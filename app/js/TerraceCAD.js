@@ -46,16 +46,14 @@ SPS.TerraceCAD = function() {
         xhr.addEventListener("load", function() {
             var project = SPS.Project.parseJSON(xhr.responseText);
             for(var s of project["shapes"]) {
-                if(s["type"] == SPS.Shape.Type.PLANESEG) {
-                    viewer.addPlaneSegment(s, null);
-                }
+                if(s["type"] == SPS.Shape.Type.PLANE || s["type"] == SPS.Shape.Type.PLANESEG)
+                    viewer.addSelectableLine(s);
             }
             viewer.zoomBounds({min: {x:-3.5*30*12-7.5*12-150*12, y:-5.5*30*12-7.5*12-150*12}, max: {x:3.5*30*12+7.5*12+150*12, y:5.5*30*12+7.5*12+150*12}});
         });
         xhr.open("GET", url, true);
         xhr.send();
-    }
-    openProjectRemote("assets/sample.json");
+    }("assets/sample.json");
 
     // ================
 

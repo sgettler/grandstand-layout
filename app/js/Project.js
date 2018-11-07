@@ -116,78 +116,91 @@ SPS.Project.generateSample = function() {
     // grid lines
     for(var i = 0; i < 8; i++) {
         var gridbase = weststart.getOffsetPlane(7.5*12+i*30*12);
+        gridbase["layer"] = "hidden";
         data["shapes"].push(gridbase);
-        var grid = new SPS.PlaneSegment({
+        var gridn = new SPS.PlaneSegment({
             "layer": "grid",
             "ref": gridbase,
             "start": northstart,
             "end": northend
         });
-        data["shapes"].push(grid);
+        data["shapes"].push(gridn);
+        var grids = new SPS.PlaneSegment({
+            "layer": "grid",
+            "ref": gridbase,
+            "start": southstart,
+            "end": southend
+        });
+        data["shapes"].push(grids);
+    }
+
+    for(var i = 0; i < 12; i++) {
+        var gridbase = southstart.getOffsetPlane(7.5*12+i*30*12);
+        gridbase["layer"] = "hidden";
+        data["shapes"].push(gridbase);
+        var gridw = new SPS.PlaneSegment({
+            "layer": "grid",
+            "ref": gridbase,
+            "start": weststart,
+            "end": westend
+        });
+        data["shapes"].push(gridw);
+        var gride = new SPS.PlaneSegment({
+            "layer": "grid",
+            "ref": gridbase,
+            "start": eaststart,
+            "end": eastend
+        });
+        data["shapes"].push(gride);
     }
 
     for(var i = 0; i < 5; i++) {
         var gridbase = eaststart.getRotatedPlane(-(0.5+i)*18*Math.PI/180, northeast, zaxis);
+        gridbase["layer"] = "hidden";
         data["shapes"].push(gridbase);
         var gridstart = northstart.getRotatedPlane(-(0.5+i)*18*Math.PI/180, northeast, zaxis);
+        gridstart["layer"] = "hidden";
         data["shapes"].push(gridstart);
         var gridend = northend.getRotatedPlane(-(0.5+i)*18*Math.PI/180, northeast, zaxis);
+        gridend["layer"] = "hidden";
         data["shapes"].push(gridend);
         var grid = new SPS.PlaneSegment({
             "layer": "grid",
             "ref": gridbase,
             "start": gridstart,
             "end": gridend
-        });
-        data["shapes"].push(grid);
-    }
-
-    for(var i = 0; i < 12; i++) {
-        var gridbase = northstart.getOffsetPlane(-7.5*12-i*30*12);
-        data["shapes"].push(gridbase);
-        var grid = new SPS.PlaneSegment({
-            "layer": "grid",
-            "ref": gridbase,
-            "start": eaststart,
-            "end": eastend
         });
         data["shapes"].push(grid);
     }
 
     for(var i = 0; i < 5; i++) {
         var gridbase = southstart.getRotatedPlane(-(0.5+i)*18*Math.PI/180, southeast, zaxis);
+        gridbase["layer"] = "hidden";
         data["shapes"].push(gridbase);
         var gridstart = eaststart.getRotatedPlane(-(0.5+i)*18*Math.PI/180, southeast, zaxis);
+        gridstart["layer"] = "hidden";
         data["shapes"].push(gridstart);
         var gridend = eastend.getRotatedPlane(-(0.5+i)*18*Math.PI/180, southeast, zaxis);
+        gridend["layer"] = "hidden";
         data["shapes"].push(gridend);
         var grid = new SPS.PlaneSegment({
             "layer": "grid",
             "ref": gridbase,
             "start": gridstart,
             "end": gridend
-        });
-        data["shapes"].push(grid);
-    }
-
-    for(var i = 0; i < 8; i++) {
-        var gridbase = eaststart.getOffsetPlane(-7.5*12-i*30*12);
-        data["shapes"].push(gridbase);
-        var grid = new SPS.PlaneSegment({
-            "layer": "grid",
-            "ref": gridbase,
-            "start": southstart,
-            "end": southend
         });
         data["shapes"].push(grid);
     }
 
     for(var i = 0; i < 5; i++) {
         var gridbase = weststart.getRotatedPlane(-(0.5+i)*18*Math.PI/180, southwest, zaxis);
+        gridbase["layer"] = "hidden";
         data["shapes"].push(gridbase);
         var gridstart = southstart.getRotatedPlane(-(0.5+i)*18*Math.PI/180, southwest, zaxis);
+        gridstart["layer"] = "hidden";
         data["shapes"].push(gridstart);
         var gridend = southend.getRotatedPlane(-(0.5+i)*18*Math.PI/180, southwest, zaxis);
+        gridend["layer"] = "hidden";
         data["shapes"].push(gridend);
         var grid = new SPS.PlaneSegment({
             "layer": "grid",
@@ -198,24 +211,15 @@ SPS.Project.generateSample = function() {
         data["shapes"].push(grid);
     }
 
-    for(var i = 0; i < 12; i++) {
-        var gridbase = southstart.getOffsetPlane(7.5*12+i*30*12);
-        data["shapes"].push(gridbase);
-        var grid = new SPS.PlaneSegment({
-            "layer": "grid",
-            "ref": gridbase,
-            "start": weststart,
-            "end": westend
-        });
-        data["shapes"].push(grid);
-    }
-
     for(var i = 0; i < 5; i++) {
         var gridbase = northstart.getRotatedPlane(-(0.5+i)*18*Math.PI/180, northwest, zaxis);
+        gridbase["layer"] = "hidden";
         data["shapes"].push(gridbase);
         var gridstart = weststart.getRotatedPlane(-(0.5+i)*18*Math.PI/180, northwest, zaxis);
+        gridstart["layer"] = "hidden";
         data["shapes"].push(gridstart);
         var gridend = westend.getRotatedPlane(-(0.5+i)*18*Math.PI/180, northwest, zaxis);
+        gridend["layer"] = "hidden";
         data["shapes"].push(gridend);
         var grid = new SPS.PlaneSegment({
             "layer": "grid",

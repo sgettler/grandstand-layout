@@ -23,10 +23,13 @@ SPS.CartesianViewer = function(viewPlane) {
     this.svgDefs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
     this.svgElement.appendChild(this.svgDefs);
 
+    // shapes
+    this.planes = [];
+
     // view
     this.viewPlane = viewPlane;
-    this.viewBounds = {min: {x: -1, y: -1}, max: {x: 1, y: 1}};
-
+    this.viewBounds = [];
+    this.transform(this.width/2, this.height/2, 1);
 };
 
 SPS.CartesianViewer.prototype = Object.create(SPS.SVGViewer.prototype);
@@ -64,9 +67,13 @@ SPS.CartesianViewer.prototype.resize = function(width, height) {
 SPS.CartesianViewer.prototype.transform = function(transX, transY, scale) {
     this.svgBase.setAttribute("transform", "translate("+transX+","+transY+") scale("+scale+")");
 
-    var minX = -transX/scale;
-    var minY =  transY/scale - this.height/scale;
-    this.viewBounds = {min: {x: minX, y: minY}, max: {x: minX+this.width/scale, y: minY+this.height/scale}};
+    this.viewBounds = [
+        new SPS.Plane({"coefs": [ 0, -1, 0, transY/scale]}),
+        new SPS.Plane({"coefs": [ 1,  0, 0, transX/scale]}),
+        new SPS.Plane({"coefs": [-1,  0, 0, -transX/scale + this.width/scale]}),
+        new SPS.Plane({"coefs": [ 0,  1, 0, -transY/scale + this.height/scale]})
+    ];
+    this.updateShapes();
 };
 
 
@@ -86,33 +93,87 @@ SPS.CartesianViewer.prototype.zoomBounds = function(bounds) {
 
 
 /**
- * Add a plane segment to the interface.
+ * Find points where the plane intersects with the viewable bounds.
  *
- * @param planeSeg plane segment object
+ * @param plane plane object
+ *
+ * @return array of 3-member coordinate arrays
+ */
+SPS.CartesianViewer.prototype.getPlaneExtents = function(plane) {
+    var r = [];
+    var isInBounds = function(p) {
+        for(var v of this.viewBounds) {
+            var c = v.getCoefs();
+            if(c[0]*p[0] + c[1]*p[1] + c[2]*p[2] + c[3] < 0)
+                return false;
+        }
+        return true;
+    }.bind(this);
+    for(var v of this.viewBounds) {
+        var p = new SPS.Point({"plane1": this.viewPlane, "plane2": plane, "plane3": v}).getCoords();
+        if(!isNaN(p[0]) && !isNaN(p[1]))
+            if(isInBounds(p))
+                r.push(p);
+    }
+    return r;
+};
+
+
+
+/**
+ * Add a selectable line to the viewer.
+ *
+ * @param shape shape to add
  * @param callback function callback to be called on click
  */
-SPS.CartesianViewer.prototype.addPlaneSegment = function (planeSeg, callback) {
-    var p1 = new SPS.Point({"plane1": this.viewPlane, "plane2": planeSeg["ref"], "plane3": planeSeg["start"]}).getCoords();
-    var p2 = new SPS.Point({"plane1": this.viewPlane, "plane2": planeSeg["ref"], "plane3": planeSeg["end"]}).getCoords();
+SPS.CartesianViewer.prototype.addSelectableLine = function(shape, callback) {
+    var points = [];
+    if(shape["type"] == SPS.Shape.Type.PLANE) {
+        points = this.getPlaneExtents(shape);
+        this.planes.push(shape);
+    } else if(shape["type"] == SPS.Shape.Type.PLANESEG) {
+        points.push(new SPS.Point({"plane1": this.viewPlane, "plane2": shape["ref"], "plane3": shape["start"]}).getCoords());
+        points.push(new SPS.Point({"plane1": this.viewPlane, "plane2": shape["ref"], "plane3": shape["end"]}).getCoords());
+    }
 
     var baseElement = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
-    baseElement.setAttribute("points", p1[0]+","+(-p1[1])+" "+p2[0]+","+(-p2[1]));
-    baseElement.setAttribute("id", planeSeg["uuid"]);
+    baseElement.setAttribute("id", shape["uuid"]);
+    baseElement.setAttribute("points", function(s) {
+        for(var p of points)
+            s += p[0]+","+(-p[1])+" ";
+        return s;
+    }(""));
     this.svgDefs.appendChild(baseElement);
 
     var baseGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
-    baseGroup.setAttribute("id", planeSeg["uuid"]+"-group");
+    baseGroup.setAttribute("id", shape["uuid"]+"-group");
     this.svgDefs.appendChild(baseGroup);
 
     var selElement = document.createElementNS("http://www.w3.org/2000/svg", "use");
-    selElement.setAttribute("href", "#"+planeSeg["uuid"]);
+    selElement.setAttribute("href", "#"+shape["uuid"]);
     selElement.setAttribute("class", "selectable-line");
     baseGroup.appendChild(selElement);
     baseGroup.appendChild(selElement.cloneNode(false));
 
     var refElement = document.createElementNS("http://www.w3.org/2000/svg", "use");
-    refElement.setAttribute("href", "#"+planeSeg["uuid"]+"-group");
-    refElement.setAttribute("class", planeSeg["layer"]);
+    refElement.setAttribute("href", "#"+shape["uuid"]+"-group");
+    refElement.setAttribute("class", shape["layer"]);
     refElement.addEventListener("click", callback);
     this.svgBase.appendChild(refElement);
+};
+
+
+
+/**
+ * Update shapes which intersect with the viewable bounds.
+ */
+SPS.CartesianViewer.prototype.updateShapes = function() {
+    for(var s of this.planes) {
+        var points = this.getPlaneExtents(s);
+        document.getElementById(s["uuid"]).setAttribute("points", function(s) {
+            for(var p of points)
+                s += p[0]+","+(-p[1])+" ";
+            return s;
+        }(""));
+    }
 };

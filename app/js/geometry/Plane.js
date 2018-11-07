@@ -84,9 +84,8 @@ SPS.Plane.prototype.getCoefs = function() {
         };
         var c = this["ref"].getCoefs();
         var p = this["point"].getCoords();
-        var dr = c[3] + (c[0]*p[0]+c[1]*p[1]+c[2]*p[2]);
-        var qn = h(qr, h([0, c[0], c[1], c[2]], qi));
-        return [qn[1], qn[2], qn[3], dr-(qn[1]*p[0]+qn[2]*p[1]+qn[3]*p[2])];
+        var n = h(qr, h([0, c[0], c[1], c[2]], qi)).slice(1);
+        return [n[0], n[1], n[2], c[3]+(c[0]-n[0])*p[0]+(c[1]-n[1])*p[1]+(c[2]-n[2])*p[2]];
     }
     return Object.assign([],this["coefs"]);
 };
