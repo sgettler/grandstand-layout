@@ -22,9 +22,6 @@ var SPS = SPS || {
  */
 SPS.TerraceCAD = function() {
 
-    // project data
-    this.project = null;
-
     // create page
     SPS.TerraceCAD.createLayout();
 
@@ -42,7 +39,8 @@ SPS.TerraceCAD = function() {
 
 
     // set up project
-    this.newProject();
+    this.project = new SPS.Project({"name": "New Project"});
+    this.projectChanged = false;
     this.resetViewer();
 
     // refresh layout
@@ -53,11 +51,22 @@ SPS.TerraceCAD = function() {
 
 
 /**
- * Open new project.
+ * Create new project.
  */
 SPS.TerraceCAD.prototype.newProject = function() {
-    this.project = new SPS.Project({"name": "New Project"});
-    this.resetViewer();
+    if(this.projectChanged) {
+        var dialog = SPS.Dialog.showConfirmDialog({
+            title: "Discard current project?",
+            text: ["Creating a new project will cause you to lose all changes to the current project."],
+            accept: "DISCARD",
+            reject: "CANCEL"
+        });
+        dialog.containerElement.addEventListener("accept", function(event) {
+            this.project = new SPS.Project({"name": "New Project"});
+            this.projectChanged = false;
+            this.resetViewer();
+        }.bind(this));
+    }
 };
 
 /**
@@ -70,11 +79,25 @@ SPS.TerraceCAD.prototype.openProject = function() {
         var reader = new FileReader();
         reader.addEventListener("load", function(event) {
             this.project = SPS.Project.parseJSON(event.target.result);
+            this.projectChanged = true;
             this.resetViewer();
         }.bind(this));
         reader.readAsText(event.target.files[0]);
     }.bind(this));
-    fileElement.click();
+
+    if(this.projectChanged) {
+        var dialog = SPS.Dialog.showConfirmDialog({
+            title: "Discard current project?",
+            text: ["Opening a project will cause you to lose all changes to the current project."],
+            accept: "DISCARD",
+            reject: "CANCEL"
+        });
+        dialog.containerElement.addEventListener("accept", function(event) {
+            fileElement.click();
+        }.bind(this));
+    } else {
+        fileElement.click();
+    }
 };
 
 /**
@@ -82,15 +105,15 @@ SPS.TerraceCAD.prototype.openProject = function() {
  *
  * @param url project file url
  */
-SPS.TerraceCAD.prototype.openProjectRemote = function(url) {
-    var xhr = new XMLHttpRequest();
-    xhr.addEventListener("load", function() {
-        this.project = SPS.Project.parseJSON(xhr.responseText);
-        this.resetViewer();
-    }.bind(this));
-    xhr.open("GET", url, true);
-    xhr.send();
-};
+// SPS.TerraceCAD.prototype.openProjectRemote = function(url) {
+//     var xhr = new XMLHttpRequest();
+//     xhr.addEventListener("load", function() {
+//         this.project = SPS.Project.parseJSON(xhr.responseText);
+//         this.resetViewer();
+//     }.bind(this));
+//     xhr.open("GET", url, true);
+//     xhr.send();
+// };
 
 /**
  * Download project. Shows a dialog to confirm filename.
@@ -99,14 +122,15 @@ SPS.TerraceCAD.prototype.openProjectRemote = function(url) {
  */
 SPS.TerraceCAD.prototype.saveProject = function() {
     var dialog = SPS.Dialog.showInputDialog({
-        title: "Download as JSON",
-        text: ["Filename"],
+        title: "Download project as JSON",
+        text: ["Project filename"],
         defs: ["project.json"],
         accept: "SAVE",
         reject: "CANCEL"
     });
     dialog.containerElement.addEventListener("accept", function(event) {
         this.project.downloadJSON(event.detail.value[0]);
+        this.projectChanged = false;
     }.bind(this));
 };
 

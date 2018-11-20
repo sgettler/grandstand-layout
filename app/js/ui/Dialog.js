@@ -127,6 +127,35 @@ SPS.Dialog.showAlertDialog = function(args) {
 };
 
 /**
+ * Create a confirmation dialog with a message and accept and reject buttons.
+ *
+ * @param args arguments object
+ */
+SPS.Dialog.showConfirmDialog = function(args) {
+    var dialog = new SPS.Dialog(args);
+
+    // text
+    dialog.contentElement.appendChild(document.createTextNode(args.text[0]));
+
+    // reject button
+    var rejectButtonElement = dialog.createButtonElement(args.reject);
+
+    // events
+    dialog.acceptButtonElement.addEventListener("click", function() {
+        dialog.containerElement.dispatchEvent(new CustomEvent("accept", { detail: {} }));
+        dialog.hide();
+    });
+    rejectButtonElement.addEventListener("click", function() {
+        dialog.containerElement.dispatchEvent(new CustomEvent("reject", { detail: {} }));
+        dialog.hide();
+    });
+
+    // show
+    dialog.show();
+    return dialog;
+};
+
+/**
  * Create an input dialog with text boxes and accept and reject buttons.
  *
  * @param args arguments object
