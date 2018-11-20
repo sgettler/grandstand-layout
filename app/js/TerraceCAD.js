@@ -32,7 +32,7 @@ SPS.TerraceCAD = function() {
     header.addMenu();
     header.addMenuItem("New", null);
     header.addMenuItem("Open", null);
-    header.addMenuItem("Save", null);
+    header.addMenuItem("Save", this.saveProject.bind(this));
     header.addMenu();
     header.addMenuItem("Export", null);
 
@@ -74,9 +74,30 @@ SPS.TerraceCAD = function() {
 
 
 /**
+ * Download project. Shows a dialog to confirm filename.
+ *
+ * @todo probably want to validate that filename
+ */
+SPS.TerraceCAD.prototype.saveProject = function() {
+    var dialog = SPS.Dialog.showInputDialog({
+        title: "Download as JSON",
+        text: ["Filename"],
+        defs: ["project.json"],
+        accept: "SAVE",
+        reject: "CANCEL"
+    });
+    dialog.containerElement.addEventListener("accept", function(event) {
+        this.project.downloadJSON(event.detail.value[0]);
+    }.bind(this));
+};
+
+
+
+/**
  * Create DOM elements to lay out app interface.
  */
 SPS.TerraceCAD.createLayout = function() {
+    // window
     var parentElement = document.createElement("div");
     parentElement.id = "container";
     document.body.appendChild(parentElement);
@@ -96,4 +117,20 @@ SPS.TerraceCAD.createLayout = function() {
     var viewerElement = document.createElement("div");
     viewerElement.id = "viewer";
     contentElement.appendChild(viewerElement);
+
+    // dialogs
+    var dialogParentElement = document.createElement("div");
+    dialogParentElement.id = "dialog-container";
+    dialogParentElement.style.visibility = "hidden";
+    document.body.appendChild(dialogParentElement);
+
+    var fillElement = document.createElement("div");
+    fillElement.classList.add("dialog-scrim");
+    dialogParentElement.appendChild(fillElement);
+
+    var dialogElement = document.createElement("div");
+    dialogElement.id = "dialog";
+    dialogParentElement.appendChild(dialogElement);
+
+    dialogParentElement.appendChild(fillElement.cloneNode(false));
 };
