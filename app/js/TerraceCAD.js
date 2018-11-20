@@ -22,56 +22,75 @@ var SPS = SPS || {
  */
 SPS.TerraceCAD = function() {
 
-    // data
-    this.project = new SPS.Project({"name": "New Project"});
+    // project data
+    this.project = null;
 
     // create page
     SPS.TerraceCAD.createLayout();
 
     var header = new SPS.Header("SPS Grandstand Layout Tool", "assets/img/sps_white_48.png");
     header.addMenu();
-    header.addMenuItem("New", null);
-    header.addMenuItem("Open", null);
+    header.addMenuItem("New", this.newProject.bind(this));
+    header.addMenuItem("Open", this.openProject.bind(this));
     header.addMenuItem("Save", this.saveProject.bind(this));
-    header.addMenu();
-    header.addMenuItem("Export", null);
+    // header.addMenu();
+    // header.addMenuItem("Export", null);
 
-    var viewer = new SPS.CartesianViewer(SPS.Plane.XY_PLANE);
-    window.addEventListener("resize", function(e) { viewer.resize(window.innerWidth-384, window.innerHeight-64); }.bind(this));
-
-
-
-    // ================
-    // placeholder
-
-    for(var s of this.project["shapes"])
-        if(s["type"] == SPS.Shape.Type.PLANE || s["type"] == SPS.Shape.Type.PLANESEG)
-            viewer.addSelectableLine(s, null);
-
-    // var openProjectRemote = function(url) {
-    //     var xhr = new XMLHttpRequest();
-    //     xhr.addEventListener("load", function() {
-    //         project = SPS.Project.parseJSON(xhr.responseText);
-    //         for(var s of project["shapes"]) {
-    //             if(s["type"] == SPS.Shape.Type.PLANE || s["type"] == SPS.Shape.Type.PLANESEG)
-    //                 viewer.addSelectableLine(s, null);
-    //         }
-    //         viewer.zoomBounds({min: {x:-3.5*30*12-7.5*12-150*12, y:-5.5*30*12-7.5*12-150*12}, max: {x:3.5*30*12+7.5*12+150*12, y:5.5*30*12+7.5*12+150*12}});
-    //     });
-    //     xhr.open("GET", url, true);
-    //     xhr.send();
-    // }("sample.json");
-
-    // ================
+    this.viewer = new SPS.CartesianViewer(SPS.Plane.XY_PLANE);
+    window.addEventListener("resize", function(e) { this.viewer.resize(window.innerWidth-384, window.innerHeight-64); }.bind(this));
 
 
+
+    // set up project
+    this.newProject();
+    this.resetViewer();
 
     // refresh layout
-    viewer.resize(window.innerWidth-384, window.innerHeight-64);
-    viewer.zoomCenter();
+    this.viewer.resize(window.innerWidth-384, window.innerHeight-64);
+    this.viewer.zoomCenter();
 };
 
 
+
+/**
+ * Open new project.
+ */
+SPS.TerraceCAD.prototype.newProject = function() {
+    this.project = new SPS.Project({"name": "New Project"});
+    this.resetViewer();
+};
+
+/**
+ * Open project from local file.
+ */
+SPS.TerraceCAD.prototype.openProject = function() {
+    var fileElement = document.createElement("input");
+    fileElement.type = "file";
+    fileElement.addEventListener("change", function(event) {
+        var reader = new FileReader();
+        reader.addEventListener("load", function(event) {
+            this.project = SPS.Project.parseJSON(event.target.result);
+            this.resetViewer();
+        }.bind(this));
+        reader.readAsText(event.target.files[0]);
+    }.bind(this));
+    fileElement.click();
+};
+
+/**
+ * Open project from remote file.
+ *
+ * @param url project file url
+ */
+SPS.TerraceCAD.prototype.openProjectRemote = function(url) {
+    var xhr = new XMLHttpRequest();
+    xhr.addEventListener("load", function() {
+        this.project = SPS.Project.parseJSON(xhr.responseText);
+        this.resetViewer();
+    }.bind(this));
+    xhr.open("GET", url, true);
+    xhr.send();
+};
 
 /**
  * Download project. Shows a dialog to confirm filename.
@@ -89,6 +108,19 @@ SPS.TerraceCAD.prototype.saveProject = function() {
     dialog.containerElement.addEventListener("accept", function(event) {
         this.project.downloadJSON(event.detail.value[0]);
     }.bind(this));
+};
+
+
+
+/**
+ * Refresh project in viewer.
+ */
+SPS.TerraceCAD.prototype.resetViewer = function() {
+    this.viewer.removeAll();
+
+    for(var s of this.project["shapes"])
+        if(s["type"] == SPS.Shape.Type.PLANE || s["type"] == SPS.Shape.Type.PLANESEG)
+            this.viewer.addSelectableLine(s, null);
 };
 
 

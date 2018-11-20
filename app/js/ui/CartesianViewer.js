@@ -174,6 +174,16 @@ SPS.CartesianViewer.prototype.addSelectableLine = function(shape, callback) {
     this.svgBase.appendChild(refElement);
 };
 
+/**
+ * Remove all shapes.
+ */
+SPS.CartesianViewer.prototype.removeAll = function() {
+    while(this.svgBase.firstChild)
+        this.svgBase.firstChild.remove();
+    while(this.svgDefs.firstChild)
+        this.svgDefs.firstChild.remove();
+    this.planes = [];
+};
 
 
 /**
