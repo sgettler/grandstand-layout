@@ -41,7 +41,8 @@ SPS.Shape.prototype.getUUIDv4 = function() {
 SPS.Shape.Type = {
     POINT: "point",
     PLANE: "plane",
-    PLANESEG: "planeseg"
+    PLANESEG: "planeseg",
+    PLANESURF: "planesurf"
 };
 
 

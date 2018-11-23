@@ -59,6 +59,8 @@ SPS.Project.parseJSON = function(json) {
                 return new SPS.Plane(s);
             if(s["type"] == SPS.Shape.Type.PLANESEG)
                 return new SPS.PlaneSegment(s);
+            if(s["type"] == SPS.Shape.Type.PLANESURF)
+                return new SPS.PlaneSurface(s);
             return new SPS.Shape(s);
         }(project["shapes"][i]);
 
@@ -233,6 +235,27 @@ SPS.Project.generateSample = function() {
         });
         data["shapes"].push(grid);
     }
+
+    // terrace shapes
+    var tread = SPS.Plane.XY_PLANE.getOffsetPlane(162);
+    var northfob = northstart.getOffsetPlane(19*12);
+    var northrow2 = northfob.getOffsetPlane(36);
+    var gridleft = weststart.getOffsetPlane(7.5*12+188);
+    var gridright = weststart.getOffsetPlane(7.5*12+1*30*12);
+    data["shapes"].push(tread);
+    data["shapes"].push(northfob);
+    data["shapes"].push(northrow2);
+    data["shapes"].push(gridleft);
+    data["shapes"].push(gridright);
+    var terrace = new SPS.PlaneSurface({
+        "layer": "terrace",
+        "ref": tread,
+        "edge1": northfob,
+        "edge2": gridright,
+        "edge3": northrow2,
+        "edge4": gridleft
+    });
+    data["shapes"].push(terrace);
 
     // export
     data.downloadJSON("sample.json");

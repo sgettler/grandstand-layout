@@ -30,6 +30,10 @@ polygon, polyline {
 
 
 /* layer styles */
+.hidden {
+    visibility: hidden;
+}
+
 .origin {
     stroke: #7f7f7f;
     stroke-width: 0.5px;
@@ -38,11 +42,6 @@ polygon, polyline {
 .origin:hover {
     stroke: #ffffff;
 }
-
-.hidden {
-    visibility: hidden;    
-}
-
 
 .grid {
     stroke: #ff3f3f;
@@ -54,4 +53,13 @@ polygon, polyline {
 }
 .grid-selected {
     stroke: #0000ff;
+}
+
+.terrace {
+    stroke: #00003f;
+    stroke-width: 1.0px;
+    fill: rgba(0,0,127,0.1);
+}
+.terrace:hover {
+    fill: rgba(0,0,127,0.5);
 }

@@ -175,6 +175,33 @@ SPS.CartesianViewer.prototype.addSelectableLine = function(shape, callback) {
 };
 
 /**
+ * Add a selectable polygon to the viewer.
+ *
+ * @param shape shape to add
+ * @param callback function callback to be called on click
+ */
+SPS.CartesianViewer.prototype.addSelectablePolygon = function(shape, callback) {
+    var points = [];
+    for(var i = 0; i < 4; i++)
+        points.push(new SPS.Point({"plane1": shape["ref"], "plane2": shape["edge"+(i+1)], "plane3": shape["edge"+((i+1)%4+1)]}).getCoords());
+
+    var baseElement = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+    baseElement.setAttribute("id", shape["uuid"]);
+    baseElement.setAttribute("points", function(s) {
+        for(var p of points)
+            s += p[0]+","+(-p[1])+" ";
+        return s;
+    }(""));
+    this.svgDefs.appendChild(baseElement);
+
+    var refElement = document.createElementNS("http://www.w3.org/2000/svg", "use");
+    refElement.setAttribute("href", "#"+shape["uuid"]);
+    refElement.setAttribute("class", shape["layer"]);
+    refElement.addEventListener("click", callback);
+    this.svgBase.appendChild(refElement);
+};
+
+/**
  * Remove all shapes.
  */
 SPS.CartesianViewer.prototype.removeAll = function() {
@@ -184,6 +211,7 @@ SPS.CartesianViewer.prototype.removeAll = function() {
         this.svgDefs.firstChild.remove();
     this.planes = [];
 };
+
 
 
 /**

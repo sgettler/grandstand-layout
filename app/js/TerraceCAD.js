@@ -142,9 +142,12 @@ SPS.TerraceCAD.prototype.saveProject = function() {
 SPS.TerraceCAD.prototype.resetViewer = function() {
     this.viewer.removeAll();
 
-    for(var s of this.project["shapes"])
+    for(var s of this.project["shapes"]) {
         if(s["type"] == SPS.Shape.Type.PLANE || s["type"] == SPS.Shape.Type.PLANESEG)
             this.viewer.addSelectableLine(s, null);
+        if(s["type"] == SPS.Shape.Type.PLANESURF)
+            this.viewer.addSelectablePolygon(s, null);
+    }
 };
 
 
